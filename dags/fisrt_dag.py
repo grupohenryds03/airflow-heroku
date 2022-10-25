@@ -20,7 +20,7 @@ def execute_query(connection, query):
     cursor.execute(query)
     cursor.close()
 
-def file_to_stage():
+def file_to_temp():
     import pandas as pd
     import ssl
     import tempfile
@@ -31,6 +31,8 @@ def file_to_stage():
         df=pd.read_csv('https://raw.githubusercontent.com/grupohenryds03/esperanza_vida/main/datasets/Complete.csv')
         df.drop('Unnamed: 0',inplace=True, axis=1)
         df.to_csv(temp_dir +'/EV_completo.csv', index=False)
+
+def file_to_stage():
         sql = f"PUT file://{temp_dir+'/EV_completo.csv'} @DATA_STAGE auto_compress=true"
         execute_query(conn, sql)
     
@@ -40,10 +42,16 @@ with DAG(
     dag_id='file_to_stage_snowflake',
     schedule_interval='@yearly',
     start_date=datetime(year=2022, month=10, day=22),
-    catchup=False
-) as dag:
+    catchup=False) as dag:
+
+    tast_pandas=PythonOperator(
+        task_id='file_to_temp',
+        python_callable=file_to_temp
+    )
    
     tast_pandas=PythonOperator(
-        task_id='put_file',
+        task_id='file_to_stage',
         python_callable=file_to_stage
     )
+
+    file_to_temp >> file_to_stage
