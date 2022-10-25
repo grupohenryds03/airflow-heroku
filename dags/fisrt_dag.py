@@ -43,16 +43,15 @@ with DAG(
     dag_id='file_to_stage_snowflake',
     schedule_interval='@yearly',
     start_date=datetime(year=2022, month=10, day=22),
-    catchup=False) as dag:
+    catchup=False
+    ) as dag:
 
     tast_pandas=PythonOperator(
         task_id='file_to_temp',
-        python_callable=file_to_temp
-    )
+        python_callable=file_to_temp)
    
     tast_pandas=PythonOperator(
         task_id='file_to_stage',
-        python_callable=file_to_stage
-    )
+        python_callable=file_to_stage)
 
-file_to_temp >> file_to_stage
+    file_to_temp >> file_to_stage
