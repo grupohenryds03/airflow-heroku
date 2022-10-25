@@ -8,6 +8,19 @@ from airflow.models import Variable
 import snowflake.connector
 import tempfile
 
+conn = snowflake.connector.connect(
+    user='grupods03',
+    password='Henry2022#',
+    account='nr28668.sa-east-1.aws',
+    database='prueba',
+    warehouse='dw_prueba',
+    schema='public')
+
+def execute_query(connection, query):
+    cursor = connection.cursor()
+    cursor.execute(query)
+    cursor.close()
+
 temp_dir=tempfile.TemporaryDirectory()
 
 def extract():
@@ -332,30 +345,11 @@ def extract():
 
     #Hacemos el csv
     hechos.to_csv(temp_dir +'/EV.csv', index=False)
+    sql = f"PUT file://{temp_dir+'/EV.csv'} @DATA_STAGE auto_compress=true"
+    execute_query(conn, sql)
     
 
 #-----------------------------------------------------------------
-conn = snowflake.connector.connect(
-    user='grupods03',
-    password='Henry2022#',
-    account='nr28668.sa-east-1.aws',
-    database='prueba',
-    warehouse='dw_prueba',
-    schema='public')
-
-def execute_query(connection, query):
-    cursor = connection.cursor()
-    cursor.execute(query)
-    cursor.close()
-
-def fun_file_to_stage():
-    import pandas as pd
-    import ssl
-    ssl._create_default_https_context = ssl._create_unverified_context
-    sql="remove @DATA_STAGE pattern='.*.csv.gz'"
-    execute_query(conn, sql)
-    sql = f"PUT file://{temp_dir+'/EV.csv'} @DATA_STAGE auto_compress=true"
-    execute_query(conn, sql)
 
 with DAG(
     dag_id='file_to_stage_snowflake',
@@ -368,8 +362,6 @@ with DAG(
         task_id='file_to_temp',
         python_callable=extract)
     
-    tast_file_to_stage=PythonOperator(
-        task_id='file_to_stage',
-        python_callable=fun_file_to_stage)
     
-tast_file_to_temp >> tast_file_to_stage
+    
+tast_file_to_temp
