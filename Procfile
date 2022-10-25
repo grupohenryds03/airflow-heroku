@@ -1,2 +1,3 @@
 web: airflow webserver --port $PORT
-worker: airflow celery worker & airflow scheduler
+web: airflow celery worker
+web: airflow scheduler
