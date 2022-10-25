@@ -23,7 +23,7 @@ def execute_query(connection, query):
 
 temp_dir=tempfile.TemporaryDirectory()
 
-def file_to_temp():
+def fun_file_to_temp():
     import pandas as pd
     import ssl
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -31,7 +31,7 @@ def file_to_temp():
     df.drop('Unnamed: 0',inplace=True, axis=1)
     df.to_csv(temp_dir +'/EV_completo.csv', index=False)
 
-def file_to_stage():
+def fun_file_to_stage():
         sql="remove @DATA_STAGE pattern='.*.csv.gz'"
         execute_query(conn, sql)
         sql = f"PUT file://{temp_dir+'/EV_completo.csv'} @DATA_STAGE auto_compress=true"
@@ -46,12 +46,12 @@ with DAG(
     catchup=False
     ) as dag:
 
-    tast_pandas=PythonOperator(
+    tast_file_to_temp=PythonOperator(
         task_id='file_to_temp',
-        python_callable=file_to_temp)
+        python_callable=fun_file_to_temp)
    
-    tast_pandas=PythonOperator(
+    tast_file_to_stage=PythonOperator(
         task_id='file_to_stage',
-        python_callable=file_to_stage)
+        python_callable=fun_file_to_stage)
 
-    file_to_temp >> file_to_stage
+tas_file_to_temp >> task_file_to_stage
