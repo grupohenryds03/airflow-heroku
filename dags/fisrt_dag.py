@@ -54,4 +54,4 @@ with DAG(
         python_callable=file_to_stage
     )
 
-    file_to_temp >> file_to_stage
+file_to_temp >> file_to_stage
