@@ -21,10 +21,11 @@ def execute_query(connection, query):
     cursor.execute(query)
     cursor.close()
 
-def extract(ti):
+def extract():
     import pandas as pd
     import wbgapi as wb
     from sklearn import preprocessing
+    import tempfile
     import pickle
     import ssl
 
@@ -340,19 +341,13 @@ def extract(ti):
     # Concatenamos la tabla del WHO con la tabla de hechos de World Bank
 
     hechos=pd.concat([hechos,WHO])
-    ti.xcom_push(key='hechos',value=hechos)
-
-#-----------------------------------------------------------------
-
-def file_to_stage(ti):
-    import tempfile
-    sql="remove @DATA_STAGE pattern='.*.csv.gz'"
-    execute_query(conn, sql)
-    hechos=ti.xcom_pull(key='hechos', task_ids=tast_file_to_temp)
     with tempfile.TemporaryDirectory() as temp_dir:
         hechos.to_csv(temp_dir +'/EV_completo.csv', index=False)
         sql = f"PUT file://{temp_dir+'/EV_completo.csv'} @DATA_STAGE auto_compress=true"
         execute_query(conn, sql)
+
+#-----------------------------------------------------------------
+
 
 with DAG(
     dag_id='prueba_ETL',
