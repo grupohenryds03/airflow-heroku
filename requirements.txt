@@ -3,6 +3,5 @@ apache-airflow-providers-snowflake
 snowflake-connector-python
 pandas
 wbgapi
-pickle
 sklearn
 
