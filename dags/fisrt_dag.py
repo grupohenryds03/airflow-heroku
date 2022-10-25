@@ -17,16 +17,17 @@ def execute_query(connection, query):
     cursor.execute(query)
     cursor.close()
 
-def file_to_temp():
+def file_to_temp(ti):
     import pandas as pd
     import ssl
     ssl._create_default_https_context = ssl._create_unverified_context
     df=pd.read_csv('https://raw.githubusercontent.com/grupohenryds03/esperanza_vida/main/datasets/Complete.csv')
     df.drop('Unnamed: 0',inplace=True, axis=1)
+    ti.xcom_push(key='df', value=df)
         
 
-def file_to_stage():
-    global df
+def file_to_stage(ti):
+    df=ti.xcom_pull(key='df', task_ids=file_to_temp)
     import tempfile
     sql="remove @DATA_STAGE pattern='.*.csv.gz'"
     execute_query(conn, sql)
