@@ -1,0 +1,34 @@
+{
+    "name": "Airflow on Heroku",
+    "description": "Airflow on Heroku",
+    "repository": "https://github.com/slyapustin/airflow-on-heroku",
+    "keywords": [
+        "airflow",
+        "heroku",
+        "python"
+    ],
+    "addons": [
+        "heroku-postgresql:hobby-dev",
+        "heroku-redis:hobby-dev"
+    ],
+    "env": {
+        "AIRFLOW_HOME": {
+            "description": "Airflow Home Directory Location",
+            "value": "/app"
+        }
+
+    },
+    "formation": {
+        "web": {
+            "quantity": 1,
+            "size": "free"
+        },
+        "worker": {
+            "quantity": 1,
+            "size": "free"
+        }
+    },
+    "scripts": {
+        "postdeploy": "airflow db init"
+    }
+}
