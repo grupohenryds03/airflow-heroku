@@ -6,6 +6,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.models import Variable
 import snowflake.connector
+import tempfile
 
 conn = snowflake.connector.connect(
     user='grupods03',
@@ -20,19 +21,19 @@ def execute_query(connection, query):
     cursor.execute(query)
     cursor.close()
 
+temp_dir=tempfile.TemporaryDirectory()
+
 def file_to_temp():
     import pandas as pd
     import ssl
-    import tempfile
-    with tempfile.TemporaryDirectory() as temp_dir:
-        ssl._create_default_https_context = ssl._create_unverified_context
-        sql="remove @DATA_STAGE pattern='.*.csv.gz'"
-        execute_query(conn, sql)
-        df=pd.read_csv('https://raw.githubusercontent.com/grupohenryds03/esperanza_vida/main/datasets/Complete.csv')
-        df.drop('Unnamed: 0',inplace=True, axis=1)
-        df.to_csv(temp_dir +'/EV_completo.csv', index=False)
+    ssl._create_default_https_context = ssl._create_unverified_context
+    df=pd.read_csv('https://raw.githubusercontent.com/grupohenryds03/esperanza_vida/main/datasets/Complete.csv')
+    df.drop('Unnamed: 0',inplace=True, axis=1)
+    df.to_csv(temp_dir +'/EV_completo.csv', index=False)
 
 def file_to_stage():
+        sql="remove @DATA_STAGE pattern='.*.csv.gz'"
+        execute_query(conn, sql)
         sql = f"PUT file://{temp_dir+'/EV_completo.csv'} @DATA_STAGE auto_compress=true"
         execute_query(conn, sql)
     
