@@ -1,7 +1,7 @@
 {
     "name": "Airflow on Heroku",
     "description": "Airflow on Heroku",
-    "repository": "https://github.com/slyapustin/airflow-on-heroku",
+    "repository": "https://github.com/grupohenryds03/airflow-heroku",
     "keywords": [
         "airflow",
         "heroku",
@@ -16,7 +16,6 @@
             "description": "Airflow Home Directory Location",
             "value": "/app"
         }
-
     },
     "formation": {
         "web": {
