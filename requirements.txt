@@ -1,4 +1,4 @@
-apache-airflow[postgres,celery]==2.3.3
+apache-airflow[postgres,celery,redis]==2.3.3
 apache-airflow-providers-snowflake
 snowflake-connector-python
 pandas
