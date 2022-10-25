@@ -46,12 +46,12 @@ with DAG(
     catchup=False
     ) as dag:
 
-    tast_file_to_temp=PythonOperator(
+    task_file_to_temp=PythonOperator(
         task_id='file_to_temp',
         python_callable=fun_file_to_temp)
    
-    tast_file_to_stage=PythonOperator(
+    task_file_to_stage=PythonOperator(
         task_id='file_to_stage',
         python_callable=fun_file_to_stage)
 
-tas_file_to_temp >> task_file_to_stage
+task_file_to_temp >> task_file_to_stage

@@ -6,8 +6,9 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.models import Variable
 import snowflake.connector
+import tempfile
 
-
+temp_dir=tempfile.TemporaryDirectory()
 
 def extract():
     import pandas as pd
@@ -15,23 +16,17 @@ def extract():
     from sklearn import preprocessing
     import pickle
     import ssl
-    import tempfile
-    
 
     ssl._create_default_https_context = ssl._create_unverified_context
-
     # --------------------------------------------------# 
     #                                                   #
     #       Cargamos datos al csv de hechos crudo       #
     #                                                   #
     # --------------------------------------------------#
-
-
     # ----------------------------------------------#
     #   Ingestamos datos de 30años a un dataframe   #
     #       sin los indicadores de los KPI's.       #
     # ----------------------------------------------#
-
 
     Nation_code= ['USA','CAN','MEX','CRI','PAN','BRA','ARG','CHL','URY','BOL','PER','EGY','LBY','ZAF','NGA','MAR','AUS','CHN','IND','THA','JPN','KOR','ISR','SAU','MYS','IDN','RUS','TUR','ESP','BGR','FRA','ITA','DEU','GBR','NOR','SWE','GRC']
     Indicador_code_INCOMPLETE = ['AG.LND.PRCP.MM',
@@ -74,12 +69,10 @@ def extract():
                     numericTimeKeys=True)
     df2=df2.reset_index()
     df2=df2.melt(id_vars=['economy','time'], var_name="ID_INDICADOR", value_name="VALOR")
-
     # ----------------------------------------------------------#
     #      Ingesta de los indicadores de KPI's a dataframe      #
     #       diferenciando desde el año que existen datos        #
     # ----------------------------------------------------------#
-
     #Población rural desde 1960
     PR62=wb.data.DataFrame('SP.RUR.TOTL.ZS', 
                     Nation_code, 
@@ -338,9 +331,8 @@ def extract():
     hechos=pd.concat([hechos,WHO])
 
     #Hacemos el csv
-    hechos.to_csv('Hechos.csv')
-
-
+    hechos.to_csv(temp_dir +'/EV.csv', index=False)
+    
 
 #-----------------------------------------------------------------
 conn = snowflake.connector.connect(
@@ -356,21 +348,14 @@ def execute_query(connection, query):
     cursor.execute(query)
     cursor.close()
 
-def file_to_stage():
+def fun_file_to_stage():
     import pandas as pd
     import ssl
-    import tempfile
-    with tempfile.TemporaryDirectory() as temp_dir:
-        ssl._create_default_https_context = ssl._create_unverified_context
-        sql="remove @DATA_STAGE pattern='.*.csv.gz'"
-        execute_query(conn, sql)
-        df=pd.read_csv('https://raw.githubusercontent.com/grupohenryds03/esperanza_vida/main/datasets/Complete.csv')
-        df.drop('Unnamed: 0',inplace=True, axis=1)
-        df.to_csv(temp_dir +'/EV_completo.csv', index=False)
-        sql = f"PUT file://{temp_dir+'/EV_completo.csv'} @DATA_STAGE auto_compress=true"
-        execute_query(conn, sql)
-    
-
+    ssl._create_default_https_context = ssl._create_unverified_context
+    sql="remove @DATA_STAGE pattern='.*.csv.gz'"
+    execute_query(conn, sql)
+    sql = f"PUT file://{temp_dir+'/EV.csv'} @DATA_STAGE auto_compress=true"
+    execute_query(conn, sql)
 
 with DAG(
     dag_id='file_to_stage_snowflake',
@@ -379,7 +364,12 @@ with DAG(
     catchup=False
 ) as dag:
    
-    tast_pandas=PythonOperator(
-        task_id='put_file',
-        python_callable=file_to_stage
-    )
+    tast_file_to_temp=PythonOperator(
+        task_id='file_to_temp',
+        python_callable=extract)
+    
+    tast_file_to_stage=PythonOperator(
+        task_id='file_to_stage',
+        python_callable=fun_file_to_stage)
+    
+tast_file_to_temp >> tast_file_to_stage
