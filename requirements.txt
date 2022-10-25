@@ -1,3 +1,5 @@
 apache-airflow[postgres,celery,redis]==2.3.3
 snowflake-connector-python
 pandas
+wbgapi
+
