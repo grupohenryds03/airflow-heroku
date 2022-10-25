@@ -23,7 +23,7 @@ def execute_query(connection, query):
 
 temp_dir=tempfile.TemporaryDirectory()
 
-def extract():
+def extract(ti):
     import pandas as pd
     import wbgapi as wb
     from sklearn import preprocessing
@@ -342,19 +342,19 @@ def extract():
     # Concatenamos la tabla del WHO con la tabla de hechos de World Bank
 
     hechos=pd.concat([hechos,WHO])
+    ti.xcom_push(key='hechos',value=hechos)
 
-    #Hacemos el csv
 #-----------------------------------------------------------------
 
-def file_to_stage(df):
+def file_to_stage(ti):
     import tempfile
     sql="remove @DATA_STAGE pattern='.*.csv.gz'"
     execute_query(conn, sql)
+    hechos=ti.xcom_pull(key='hechos', task_ids=tast_file_to_temp)
     with tempfile.TemporaryDirectory() as temp_dir:
-        df.to_csv(temp_dir +'/EV_completo.csv', index=False)
+        hechos.to_csv(temp_dir +'/EV_completo.csv', index=False)
         sql = f"PUT file://{temp_dir+'/EV_completo.csv'} @DATA_STAGE auto_compress=true"
         execute_query(conn, sql)
-
 
 with DAG(
     dag_id='prueba_ETL',
