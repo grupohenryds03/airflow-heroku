@@ -30,17 +30,17 @@ def fun_file_to_temp():
     df=pd.read_csv('https://raw.githubusercontent.com/grupohenryds03/esperanza_vida/main/datasets/Complete.csv')
     df.drop('Unnamed: 0',inplace=True, axis=1)
     df.to_csv(temp_dir +'/EV_completo.csv', index=False)
+    sql = f"PUT file://{temp_dir+'/EV_completo.csv'} @DATA_STAGE auto_compress=true"
+    return sql
 
-def fun_file_to_stage():
-        sql="remove @DATA_STAGE pattern='.*.csv.gz'"
-        execute_query(conn, sql)
-        sql = f"PUT file://{temp_dir+'/EV_completo.csv'} @DATA_STAGE auto_compress=true"
+def fun_file_to_stage(sql):
+        
         execute_query(conn, sql)
     
 
 
 with DAG(
-    dag_id='file_to_stage_snowflake',
+    dag_id='prueba1',
     schedule_interval='@yearly',
     start_date=datetime(year=2022, month=10, day=22),
     catchup=False

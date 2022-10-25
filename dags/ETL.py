@@ -352,7 +352,7 @@ def extract():
 #-----------------------------------------------------------------
 
 with DAG(
-    dag_id='file_to_stage_snowflake',
+    dag_id='prueba_ETL',
     schedule_interval='@yearly',
     start_date=datetime(year=2022, month=10, day=22),
     catchup=False
@@ -361,7 +361,5 @@ with DAG(
     tast_file_to_temp=PythonOperator(
         task_id='file_to_temp',
         python_callable=extract)
-    
-    
-    
+
 tast_file_to_temp
