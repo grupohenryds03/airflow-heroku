@@ -1,4 +1,4 @@
-web: airflow db init
-web: airflow webserver -p $PORT 
-worker: airflow worker 
+web: airflow webserver --port $PORT
+worker: airflow celery worker
 scheduler: airflow scheduler
+
