@@ -23,10 +23,10 @@ def file_to_temp():
     ssl._create_default_https_context = ssl._create_unverified_context
     df=pd.read_csv('https://raw.githubusercontent.com/grupohenryds03/esperanza_vida/main/datasets/Complete.csv')
     df.drop('Unnamed: 0',inplace=True, axis=1)
-    return df
         
 
 def file_to_stage():
+    global df
     import tempfile
     sql="remove @DATA_STAGE pattern='.*.csv.gz'"
     execute_query(conn, sql)

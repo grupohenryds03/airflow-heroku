@@ -344,12 +344,17 @@ def extract():
     hechos=pd.concat([hechos,WHO])
 
     #Hacemos el csv
-    hechos.to_csv(temp_dir +'/EV.csv', index=False)
-    sql = f"PUT file://{temp_dir+'/EV.csv'} @DATA_STAGE auto_compress=true"
-    execute_query(conn, sql)
-    
-
 #-----------------------------------------------------------------
+
+def file_to_stage(df):
+    import tempfile
+    sql="remove @DATA_STAGE pattern='.*.csv.gz'"
+    execute_query(conn, sql)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        df.to_csv(temp_dir +'/EV_completo.csv', index=False)
+        sql = f"PUT file://{temp_dir+'/EV_completo.csv'} @DATA_STAGE auto_compress=true"
+        execute_query(conn, sql)
+
 
 with DAG(
     dag_id='prueba_ETL',
@@ -361,5 +366,8 @@ with DAG(
     tast_file_to_temp=PythonOperator(
         task_id='file_to_temp',
         python_callable=extract)
+    tast_file_to_stage=PythonOperator(
+        task_id='file_to_stage',
+        python_callable=file_to_stage)
 
-tast_file_to_temp
+tast_file_to_temp >> tast_file_to_stage
