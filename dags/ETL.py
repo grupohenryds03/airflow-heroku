@@ -6,7 +6,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.models import Variable
 import snowflake.connector
-import tempfile
+
 
 conn = snowflake.connector.connect(
     user='grupods03',
@@ -20,8 +20,6 @@ def execute_query(connection, query):
     cursor = connection.cursor()
     cursor.execute(query)
     cursor.close()
-
-temp_dir=tempfile.TemporaryDirectory()
 
 def extract(ti):
     import pandas as pd
@@ -366,8 +364,3 @@ with DAG(
     tast_file_to_temp=PythonOperator(
         task_id='file_to_temp',
         python_callable=extract)
-    tast_file_to_stage=PythonOperator(
-        task_id='file_to_stage',
-        python_callable=file_to_stage)
-
-tast_file_to_temp >> tast_file_to_stage
