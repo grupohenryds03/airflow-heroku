@@ -26,9 +26,8 @@ def execute_query(connection, query):
 def extract_file() -> str:
     return ext.etl_extract()
 
-def file_transform(ti) -> str:
-    url=ti.xcom_push(task_ids='extract')
-    return tran.etl_transform(url)
+def file_transform() -> str:
+    return tran.etl_transform()
 
 def file_to_stage(ti) -> None:
     sql=ti.xcom_pull(task_ids='transform')

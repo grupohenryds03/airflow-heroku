@@ -11,6 +11,20 @@ def etl_extract() ->str:
 
 
     temp_dir=tempfile.mkdtemp()
+    conn = snowflake.connector.connect(
+        user='grupods03',
+        password='Henry2022#',
+        account='nr28668.sa-east-1.aws',
+        database='LAKE',
+        warehouse='DW_EV',
+        schema='public',
+        insecure_mode=True)
+
+    def execute_query(connection, query):
+        cursor = connection.cursor()
+        cursor.execute(query)
+        cursor.close()
+
 
     # --------------------------------------------------# 
     #                                                   #

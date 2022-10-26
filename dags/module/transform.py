@@ -2,12 +2,22 @@
 def etl_transform(url):
     import pandas as pd
     from sklearn.impute import KNNImputer
+    import snowflake.connector
     import ssl
     import tempfile
-
+    
     temp_dir=tempfile.mkdtemp()
+
+    conn = snowflake.connector.connect(
+        user='grupods03',
+        password='Henry2022#',
+        account='nr28668.sa-east-1.aws',
+        database='LAKE',
+        warehouse='DW_EV',
+        schema='public',
+        insecure_mode=True)
    
-    df=pd.read_csv(url)
+    df=pd.read_sql(sql,conn)
     df.drop('Unnamed: 0',inplace=True, axis=1)
 
     #-----------------------------------------------------
@@ -40,6 +50,6 @@ def etl_transform(url):
     #-----------------------------------------------------
 
 
-    df_limpio.to_csv(temp_dir +'/EV_limpio_buenaso.csv', index=False)
-    sql = f"PUT file://{temp_dir}/EV_limpio_buenaso.csv @DATA_STAGE auto_compress=true"
+    df_limpio.to_csv(temp_dir +'/EV_limpio.csv', index=False)
+    sql = f"PUT file://{temp_dir}/EV_limpio.csv @DATA_STAGE auto_compress=true"
     return sql
