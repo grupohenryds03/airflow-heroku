@@ -1,9 +1,14 @@
 # Proyecto Final -Data 03- Soy Henry
 ## Jhovany Lara, Rodrigo Ruiz, Pablo Poletti ,José María Toledo
 
-### Arquitectura: Ingesta data cruda, limpieza y carga (ETL) -> Armado de tareas para la carga incremental -> Ingesta de data a base de datos relacional -> Acceso a base de datos para modelar progreciones en machine lerning y visualización en dasboard
+### Arquitectura: 
+1. busqueda de data y análisis para data cruda
+2. Ingesta data cruda, limpieza y carga (ETL)
+3. Tareas para la carga incremental
+4.  Ingesta de data a base de datos relacional
+5. Acceso a base de datos para modelar progreciones en machine lerning y visualización en dasboard
 
-- La arquitectura sigue tres pasos principales: uno para la Extracción, Trasformación (limpieza) y Carga (Load) llamado por sus siglas ETL, un segundo paso donde se realiza la carga incremental a la base de datos relacional y el trecero donde se realizan las consltas necesarias para ser utilizada en modelos de ML.
+- La arquitectura sigue cinco pasos principales: el primero para analizar las fuentes de datos, el segundo para la Extracción, Trasformación (limpieza) y Carga (Load) llamado por sus siglas ETL. El tercer paso donde se realiza la carga incremental a la base de datos relacional, el cuarto la carga incremental y el último paso donde se realizan las consultas necesarias para ser utilizada en modelos de ML y visualización en dashboard.
 - El entorno de trabajo para el ETL se desarrola en AIRFLOW dentro de una cloud maching de HEROKU.
 - Para el armado del datalake se ingestan los datos en el entorno STAGE de SNOWFLAKE en formato .csv comprimido en .gz (pueden ser tambien json, parquet, xlsx).
 - En el caso de la base de datos relacional se utiliza SNOWFLAKE con la creación de un warehouse para su mantenimiento e ingesta incremental.
@@ -12,6 +17,7 @@
 <img src="/imagenes/diagrama solo.jpg"/>
 
 
+- diagrama de arbol de repositorio en GITHUB para correr AIRFLOW en HEROKU.
 ```bash
 airflow-heroku
 ├── dags
