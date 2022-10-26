@@ -14,7 +14,7 @@
 
 <img src="/imagenes/diagrama latin data.jpg"/>
 
-'''python
+'''bash
 airflow-heroku
 ├── dags
 │   ├── ETL.py
