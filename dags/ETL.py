@@ -1,14 +1,10 @@
 from airflow.models import DAG
-from airflow.operators.python import task
+from airflow.decorators import task
 import snowflake.connector
 from datetime import datetime
-import module.transform as tran
-import module.extract as ext
+
+
 import pandas as pd
-import tempfile
-
-
-temp_dir=tempfile.mkdtemp()
 
 conn = snowflake.connector.connect(
     user='grupods03',
@@ -26,12 +22,16 @@ def execute_query(connection, query):
 
 @task
 def extract_data() -> pd.DataFrame:
-   return ext.etl_extract()
+    import module.extract as ext
+    return ext.etl_extract()
 @task
 def transform_data(df: pd.DataFrame) -> pd.DataFrame:
-   return tran.etl_transform(df)
+    import module.transform as tran
+    return tran.etl_transform(df)
 @task
 def load_data(df: pd.DataFrame):
+    import tempfile
+    temp_dir=tempfile.mkdtemp()
     df.to_csv(temp_dir +'/EV_limpio.csv', index=False)
     sql = f"PUT file://{temp_dir}/EV_limpio.csv @DATA_STAGE auto_compress=true"
     execute_query(conn, sql)
@@ -39,10 +39,10 @@ def load_data(df: pd.DataFrame):
 
 with DAG(
    "ETL",
-   default_args={'owner': 'airflow'},
    start_date=datetime(year=2022, month=10, day=22),
    schedule_interval='@yearly',
-   catchup=False) as dag:
+   catchup=False
+   ) as dag:
         df_crudo = extract_data()
         df_limpio=transform_data(df_crudo)
         load_data(df_limpio)

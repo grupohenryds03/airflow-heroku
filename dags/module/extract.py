@@ -1,15 +1,16 @@
 
 import pandas as pd
-import wbgapi as wb
-from sklearn import preprocessing
-import pickle
-import tempfile
 
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
-temp_dir=tempfile.mkdtemp()
 
 def etl_extract() -> pd.DataFrame:
+    import wbgapi as wb
+    from sklearn import preprocessing
+    import pickle
+    import tempfile
+    import ssl
+    
+    ssl._create_default_https_context = ssl._create_unverified_context
+    temp_dir=tempfile.mkdtemp()
    
     # --------------------------------------------------# 
     #                                                   #
