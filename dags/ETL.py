@@ -23,11 +23,11 @@ def execute_query(connection, query):
     cursor.close()
 
 
-def extract_file() -> str:
+def extract_file(temp_dir) -> str:
     return ext.etl_extract()
 
-def file_transform() -> str:
-    return tran.etl_transform()
+def file_transform(temp_dir,ti) -> str:
+    return tran.etl_transform(ti)
 
 def file_to_stage(ti) -> None:
     sql=ti.xcom_pull(task_ids='transform')

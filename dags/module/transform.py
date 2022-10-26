@@ -1,11 +1,12 @@
 
-def etl_transform(url):
+def etl_transform(temp_dir,ti):
+    dir=ti.xcom_pull(task_ids='transform')
     import pandas as pd
     from sklearn.impute import KNNImputer
     import snowflake.connector
     import ssl
     import tempfile
-    
+
     temp_dir=tempfile.mkdtemp()
 
     conn = snowflake.connector.connect(
@@ -16,8 +17,8 @@ def etl_transform(url):
         warehouse='DW_EV',
         schema='public',
         insecure_mode=True)
-   
-    df=pd.read_sql(sql,conn)
+    
+    df=pd.read_sql(dir)
     df.drop('Unnamed: 0',inplace=True, axis=1)
 
     #-----------------------------------------------------

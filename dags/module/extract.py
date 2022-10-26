@@ -1,16 +1,16 @@
 
-def etl_extract() ->str:
+def etl_extract(temp_dir) ->str:
     import pandas as pd
     import wbgapi as wb
     from sklearn import preprocessing
     import snowflake.connector
     import pickle
-    import tempfile
+ 
     import ssl
     ssl._create_default_https_context = ssl._create_unverified_context
 
 
-    temp_dir=tempfile.mkdtemp()
+
     conn = snowflake.connector.connect(
         user='grupods03',
         password='Henry2022#',
@@ -515,6 +515,8 @@ def etl_extract() ->str:
     hechos=pd.concat([hechos,WHO])
 
     #Hacemos el csv
-    dir=temp_dir +'/EV.csv'
+    dir=temp_dir +'/EV_crudo.csv'
     hechos.to_csv(dir, index=False)
     return dir
+    
+    
