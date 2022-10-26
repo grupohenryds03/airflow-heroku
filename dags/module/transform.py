@@ -1,31 +1,12 @@
-from datetime import datetime
-from airflow.models import DAG
-from airflow.operators.python import PythonOperator
-import snowflake.connector
-import tempfile
 
-temp_dir=tempfile.mkdtemp()
-conn = snowflake.connector.connect(
-    user='grupods03',
-    password='Henry2022#',
-    account='nr28668.sa-east-1.aws',
-    database='prueba',
-    warehouse='dw_prueba',
-    schema='public',
-    insecure_mode=True)
-
-def execute_query(connection, query):
-    cursor = connection.cursor()
-    cursor.execute(query)
-    cursor.close()
-
-def extract_file():
-    pass
-
-def file_transform() -> str:
+def etl_transform(url):
     import pandas as pd
     from sklearn.impute import KNNImputer
     import ssl
+    import tempfile
+
+    temp_dir=tempfile.mkdtemp()
+   
     ssl._create_default_https_context = ssl._create_unverified_context
     url='https://raw.githubusercontent.com/grupohenryds03/esperanza_vida/main/datasets/Hechos.csv'
     df=pd.read_csv(url)
@@ -61,35 +42,6 @@ def file_transform() -> str:
     #-----------------------------------------------------
 
 
-    df_limpio.to_csv(temp_dir +'/EV_limpio.csv', index=False)
-    sql = f"PUT file://{temp_dir}/EV_limpio.csv @DATA_STAGE auto_compress=true"
+    df_limpio.to_csv(temp_dir +'/EV_limpio_buenaso.csv', index=False)
+    sql = f"PUT file://{temp_dir}/EV_limpio_buenaso.csv @DATA_STAGE auto_compress=true"
     return sql
-
-def file_to_stage(ti) -> None:
-    sql=ti.xcom_pull(task_ids='transform')
-    execute_query(conn, sql)
-    
-
-    
-with DAG(
-    dag_id='prueba1',
-    schedule_interval='@yearly',
-    start_date=datetime(year=2022, month=10, day=22),
-    catchup=False) as dag:
-
-    extract=PythonOperator(
-        task_id='extract',
-        python_callable=extract_file,
-    )
-    transform=PythonOperator(
-        task_id='transform',
-        python_callable=file_transform,
-        do_xcom_push=True
-    )
-
-    load=PythonOperator(
-        task_id='load',
-        python_callable=file_to_stage
-    )
-
-    extract >> transform >> load
