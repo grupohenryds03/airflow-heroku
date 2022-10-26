@@ -14,7 +14,7 @@
 
 <img src="/imagenes/diagrama latin data.jpg"/>
 
-'''bash
+```bash
 airflow-heroku
 ├── dags
 │   ├── ETL.py
@@ -28,4 +28,4 @@ airflow-heroku
 ├── requirements.txt
 ├── runtime.txt
 └── webserver_config.py
-'''
+```
