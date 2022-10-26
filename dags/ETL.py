@@ -26,10 +26,10 @@ def execute_query(connection, query):
 
 @task
 def extract_data() -> pd.DataFrame:
-   return ext.extract()
+   return ext.etl_extract()
 @task
 def transform_data(df: pd.DataFrame) -> pd.DataFrame:
-   return tran.transform(df)
+   return tran.etl_transform(df)
 @task
 def load_data(df: pd.DataFrame):
     df.to_csv(temp_dir +'/EV_limpio.csv', index=False)
