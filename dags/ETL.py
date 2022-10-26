@@ -1,13 +1,14 @@
-from datetime import datetime
 from airflow.models import DAG
-from airflow.operators.python import PythonOperator
+from airflow.operators.python import task
 import snowflake.connector
-import tempfile
+from datetime import datetime
 import module.transform as tran
 import module.extract as ext
-
+import pandas as pd
+import tempfile
 
 temp_dir=tempfile.mkdtemp()
+
 conn = snowflake.connector.connect(
     user='grupods03',
     password='Henry2022#',
@@ -22,35 +23,25 @@ def execute_query(connection, query):
     cursor.execute(query)
     cursor.close()
 
-
-def extract_file(temp_dir) -> str:
-    return ext.etl_extract(temp_dir)
-
-def file_transform(temp_dir,ti) -> str:
-    return tran.etl_transform(temp_dir,ti)
-
-def file_to_stage(ti) -> None:
-    sql=ti.xcom_pull(task_ids='transform')
+@task
+def extract_data() -> pd.DataFrame:
+   return ext.extract()
+@task
+def transform_data(df: pd.DataFrame) -> pd.DataFrame:
+   return tran.transform(df)
+@task
+def load_data(df: pd.DataFrame):
+    df.to_csv(temp_dir +'/EV_limpio.csv', index=False)
+    sql = f"PUT file://{temp_dir}/EV_limpio.csv @DATA_STAGE auto_compress=true"
     execute_query(conn, sql)
 
+
 with DAG(
-    dag_id='ETL',
-    schedule_interval='@yearly',
-    start_date=datetime(year=2022, month=10, day=22),
-    catchup=False) as dag:
-
-    extract=PythonOperator(
-        task_id='extract',
-        python_callable=extract_file,
-    )
-    transform=PythonOperator(
-        task_id='transform',
-        python_callable=file_transform,
-        do_xcom_push=True
-    )
-    load=PythonOperator(
-        task_id='load',
-        python_callable=file_to_stage
-    )
-
-    extract >> transform >> load
+   "ETL",
+   default_args={'owner': 'airflow'},
+   start_date=datetime(year=2022, month=10, day=22),
+   schedule_interval='@yearly',
+   catchup=False) as dag:
+        df_crudo = extract_data()
+        df_limpio=transform_data(df_crudo)
+        load_data(df_limpio)
