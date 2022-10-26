@@ -3,11 +3,207 @@ def etl_extract() ->str:
     import pandas as pd
     import wbgapi as wb
     from sklearn import preprocessing
+    import snowflake.connector
     import pickle
-    import ssl
     import tempfile
+    import ssl
     ssl._create_default_https_context = ssl._create_unverified_context
+
+
     temp_dir=tempfile.mkdtemp()
+
+    # --------------------------------------------------# 
+    #                                                   #
+    #         We create the Snowflake connection        #
+    #                                                   #
+    # --------------------------------------------------#
+
+    #We create the connection with Snowflake
+    conn = snowflake.connector.connect(
+        user='grupods03',
+        password='Henry2022#',
+        account='nr28668.sa-east-1.aws')
+
+    # We start connection 
+    def execute_query(connection, query):
+        cursor = connection.cursor() #Creates a cursor object. Each statement will be executed in a new cursor object.
+        cursor.execute(query)
+        cursor.close()
+
+    # --------------------------------------------------# 
+    #                                                   #
+    #           We use database and warehouse           #
+    #                                                   #
+    # --------------------------------------------------#
+
+    # Since the database and warehouse are already created, we only need to start using them:
+    query = "Use database LAKE" # Initialize database
+    execute_query(conn, query)
+
+    query = "Use warehouse DW_EV" # Initialize datawarehouse
+    execute_query(conn, query)
+
+    # --------------------------------------------------# 
+    #                                                   #
+    #       We load data to the dimension tables        #
+    #                                                   #
+    # --------------------------------------------------#
+
+    #*********************************#
+    # Loading data to CONTINENT table #
+    #*********************************#
+    Continentes=['America','Europa','Asia','Africa','Oceania']
+    df=pd.DataFrame({"CONTINENTE":Continentes})
+
+    #Se codifica ID_PAIS a partir de CODIGO_PAIS
+    le_conti = LabelEncoder()
+    le_conti.fit(df['CONTINENTE'])
+    df['ID_CONTINENTE'] = le_conti.transform(df['CONTINENTE'])
+
+    #Se guarda la codificación
+    
+    dir_conti=temp_dir+"le_conti.obj"
+    filehandler = open(dir_conti,"wb")
+    pickle.dump(le_conti,filehandler)
+    filehandler.close()
+    
+    
+
+    #****************************#
+    # Loading data to PAIS table #
+    #****************************#
+    Nation = ['United States', 'Canada','Mexico','Costa Rica','Panama','Brazil','Argentina','Chile','Uruguay','Bolivia','Peru','Egypt, Arab Rep.','Libya','South Africa','Nigeria','Morocco','Australia','China','India','Thailand','Japan','Korea, Rep.','Israel','Saudi Arabia','Malaysia','Indonesia','Russian Federation','Turkiye','Spain','Bulgaria','France','Italy','Germany','United Kingdom','Norway','Sweden','Greece']
+    Nation_code= ['USA','CAN','MEX','CRI','PAN','BRA','ARG','CHL','URY','BOL','PER','EGY','LBY','ZAF','NGA','MAR','AUS','CHN','IND','THA','JPN','KOR','ISR','SAU','MYS','IDN','RUS','TUR','ESP','BGR','FRA','ITA','DEU','GBR','NOR','SWE','GRC']
+    df=pd.DataFrame({'CODIGO_PAIS':Nation_code,'NOMBRE': Nation}) #Creamos el dataframe para PAIS
+
+    #Se codifica ID_PAIS a partir de CODIGO_PAIS
+    le_nation = LabelEncoder()
+    le_nation.fit(df['CODIGO_PAIS'])
+    df['ID_PAIS'] = le_nation.transform(df['CODIGO_PAIS'])
+
+    #Se guarda la codificación
+    dir_nation=temp_dir+"le_nation.obj"
+    filehandler = open(dir_nation,"wb")
+    pickle.dump(le_nation,filehandler)
+    filehandler.close()
+
+    
+
+    #******************************#
+    # Loading data to INCOME table #
+    #******************************#
+    Income=['Alto ingreso','Ingreso medio alto','Ingreso medio bajo']
+    CODIGO_INC=['H','M','LM']
+    df = pd.DataFrame({'INCOME':Income, 'CODIGO_INCOME':CODIGO_INC}) #Se crea el dataframe para INCOME
+
+    #Se codifica ID_INCOME a partir de Codigo_income
+    le_income = LabelEncoder()
+    le_income.fit(df['CODIGO_INCOME'])
+    df['ID_INCOME'] = le_income.transform(df['CODIGO_INCOME'])
+
+    #Se guarda la codificación
+    
+    dir_income=temp_dir+"le_income.obj"
+    filehandler = open(dir_income,"wb")
+    pickle.dump(le_income,filehandler)
+    filehandler.close()
+
+
+    #*********************************#
+    # Loading data to INDICADOR table #
+    #*********************************#
+    Indicador = ['Average precipitation in depth (mm per year)',
+    'emisiones de CO2 (kt)',
+    'crecimiento de la poblacion (% anual)',
+    'Educational attainment, at least completed primary, population 25+ years, female (%) (cumulative)',
+    'School enrollment, tertiary (% gross)',
+    'Tasa de alfabetizacion, total adultos (% de personas)',
+    'Hepatitis B (HepB3) immunization coverage among 1-year-olds (%)',
+    'Immunization, DPT (% of children ages 12-23 months)',
+    'Immunization, measles (% of children ages 12-23 months)',
+    'Incidence of HIV, all (per 1,000 uninfected population)',
+    'Mortality rate, under-5 (per 1,000 live births)',
+    'Number of deaths ages 5-9 years',
+    'Number of infant deaths (per 1,000 live births)',
+    'Polio (Pol3) immunization covergae among 1-year-olds (%)',
+    'prevalencia del consumo de tabaco, hombres',
+    'prevalencia del consumo de tabaco, mujeres',
+    'tasa de mortalidad materna (cada 100.000 nacidos vivos)',
+    'tasa de mortalidad menores de 5 años (por 1000nacidos vivos)',
+    'tasa de mortalidad, adultos hombres (por cada 1000 adultos)',
+    'tasa de mortalidad, adultos mujeres (por cada 1000 adultos)',
+    'Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age)',
+    'Access to clean fuels and technologies for cooking, rural (% of rural population)',
+    'Current education expenditure, primary (% of total expenditure in primary public institutions)',
+    'Current health expenditure (% of GDP)',
+    'desempleo total (% de la poblacion laboral)',
+    'esperanza de vida al nacer, hombres (años)',
+    'esperanza de vida al nacer, muejres (años)',
+    'esperanza de vida al nacer, Total (años)',
+    'gasto publico (% del pib)',
+    'gasto publico en educación, total (% del pbi)',
+    'GDP per capita (constant 2015 US$)',
+    'poblacion que vive en barrios marginales (% de la poblacion urbana)',
+    'Población Rural (% de la poblacion total)',
+    'poblacion urbana (%poblacion total)',
+    'Research and development expenditure (% of GDP)',
+    'Researchers in R&D (per million people)',
+    'tasa de recuento de la pobreza, multidimensional (%de la poblacion total)',
+    'Trade in services (% of GDP)'
+    ]
+    Code_Indicador = ['AG.LND.PRCP.MM',
+    'EN.ATM.CO2E.KT',
+    'SP.POP.GROW',
+    'SE.PRM.CUAT.FE.ZS',
+    'SE.TER.ENRR',
+    'SE.ADT.LITR.ZS',
+    'CSV1 from WHO',
+    'SH.IMM.IDPT',
+    'SH.IMM.MEAS',
+    'SH.HIV.INCD.TL.P3',
+    'SH.DYN.MORT',
+    'SH.DTH.0509',
+    'SH.DTH.IMRT.IN',
+    'CSV2 from WHO',
+    'SH.PRV.SMOK.MA',
+    'SH.PRV.SMOK.FE',
+    'SH.STA.MMRT',
+    'SH.DYN.MORT',
+    'SP.DYN.AMRT.MA',
+    'SP.DYN.AMRT.FE',
+    'SH.ALC.PCAP.LI',
+    'EG.CFT.ACCS.RU.ZS',
+    'SE.XPD.CPRM.ZS',
+    'SH.XPD.CHEX.GD.ZS',
+    'SL.UEM.TOTL.NE.ZS',
+    'SP.DYN.LE00.MA.IN',
+    'SP.DYN.LE00.FE.IN',
+    'SP.DYN.LE00.IN',
+    'GC.XPN.TOTL.GD.ZS',
+    'SE.XPD.TOTL.GD.ZS',
+    'NY.GDP.PCAP.KD',
+    'EN.POP.SLUM.UR.ZS',
+    'SP.RUR.TOTL.ZS',
+    'SP.URB.TOTL.IN.ZS',
+    'GB.XPD.RSDV.GD.ZS',
+    'SP.POP.SCIE.RD.P6',
+    'SI.POV.MDIM',
+    'BG.GSR.NFSV.GD.ZS'
+    ]
+    #Se crea el df para la tabla INDICADOR
+    df=pd.DataFrame({'CODIGO':Code_Indicador,'DESCRIPCION':Indicador}) 
+
+    #Se codifica ID_INDICADOR a partir de CODIGO
+    le_indicador = LabelEncoder()
+    le_indicador.fit(df['CODIGO'])
+    df['ID_INDICADOR'] = le_indicador.transform(df['CODIGO'])
+
+    #Se guarda la codificación
+    
+    dir_indicador=temp_dir+"le_indicador.obj"
+    filehandler = open(dir_indicador,"wb")
+    pickle.dump(le_indicador,filehandler)
+    filehandler.close()
 
 
     # --------------------------------------------------# 
@@ -140,7 +336,8 @@ def etl_extract() ->str:
     hechos=hechos.rename(columns={'economy':'CODIGO_PAIS','time':'ANIO'})
 
     #Cargamos codificación guardada anteriormente para indicador
-    file = open("le_indicador.obj",'rb')
+    
+    file = open(dir_indicador,'rb')
     le_loaded = pickle.load(file)
     file.close()
     #transformamos ID_INDICADOR
@@ -169,7 +366,8 @@ def etl_extract() ->str:
     hechos['CONTINENTE'] = hechos.apply(lambda row: categoria_pais(row), axis=1)
 
     #Abrimos encoder guardado
-    file = open("le_conti.obj",'rb')
+    
+    file = open(dir_conti,'rb')
     le_loaded = pickle.load(file)
     file.close()
 
@@ -193,7 +391,8 @@ def etl_extract() ->str:
     hechos['CODIGO_INCOME'] = hechos.apply(lambda row: ingreso_pais(row), axis=1)
 
     #Abrimos encoder guardado
-    file = open("le_income.obj",'rb')
+    
+    file = open(dir_income,'rb')
     le_loaded = pickle.load(file)
     file.close()
 
@@ -203,7 +402,8 @@ def etl_extract() ->str:
     # Codificamos la columna ID_PAIS
 
     #Abrimos encoder guardado
-    file = open("le_nation.obj",'rb')
+
+    file = open(dir_nation,'rb')
     le_loaded = pickle.load(file)
     file.close()
 
@@ -282,7 +482,9 @@ def etl_extract() ->str:
     WHO['CONTINENTE'] = WHO.apply(lambda row: categoria_pais(row), axis=1)
 
     #Abrimos encoder guardado
-    file = open("le_conti.obj",'rb')
+    import tempfile
+    dir=temp_dir+"le_conti.obj"
+    file = open(dir,'rb')
     le_loaded = pickle.load(file)
     file.close()
 
@@ -305,7 +507,9 @@ def etl_extract() ->str:
     WHO['CODIGO_INCOME'] = WHO.apply(lambda row: ingreso_pais(row), axis=1)
 
     #Abrimos encoder guardado
-    file = open("le_income.obj",'rb')
+    import tempfile
+    dir=temp_dir+"le_income.obj"
+    file = open(dir,'rb')
     le_loaded = pickle.load(file)
     file.close()
 
@@ -313,7 +517,8 @@ def etl_extract() ->str:
     WHO['ID_INCOME'] = le_loaded.transform(WHO['CODIGO_INCOME'])
 
     #Abrimos encoder guardado
-    file = open("le_nation.obj",'rb')
+    dir_nation=temp_dir+"le_nation.obj"
+    file = open(dir_nation,'rb')
     le_loaded = pickle.load(file)
     file.close()
 
