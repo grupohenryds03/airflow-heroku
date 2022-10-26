@@ -58,7 +58,7 @@ airflow-heroku
 
 2. tablas de dimesiones
 
-    - income
+income
 
 | col    | tipo   | key |
 |--------|--------|-----|
@@ -66,7 +66,7 @@ airflow-heroku
 | pais   | string | -   |
 | income | string | -   |
 
-    - geográfica
+geográfica
 
 | col    | tipo   | key |
 |--------|--------|-----|
@@ -74,7 +74,7 @@ airflow-heroku
 | pais   | string | -   |
 | región | string | -   |
 
-    - variables
+variables
 
 | col    | tipo   | key |
 |--------|--------|-----|
