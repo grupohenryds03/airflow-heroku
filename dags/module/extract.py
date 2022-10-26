@@ -501,6 +501,6 @@ def etl_extract() ->str:
     hechos=pd.concat([hechos,WHO])
 
     #Hacemos el csv
-    hechos.to_csv(temp_dir +'/EV.csv', index=False)
-    sql = f"PUT file://{temp_dir}/EV.csv @DATA_STAGE auto_compress=true"
-    return sql
+    dir=temp_dir +'/EV.csv'
+    hechos.to_csv(dir, index=False)
+    return dir

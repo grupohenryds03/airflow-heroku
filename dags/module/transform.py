@@ -7,8 +7,6 @@ def etl_transform(url):
 
     temp_dir=tempfile.mkdtemp()
    
-    ssl._create_default_https_context = ssl._create_unverified_context
-    url='https://raw.githubusercontent.com/grupohenryds03/esperanza_vida/main/datasets/Hechos.csv'
     df=pd.read_csv(url)
     df.drop('Unnamed: 0',inplace=True, axis=1)
 
