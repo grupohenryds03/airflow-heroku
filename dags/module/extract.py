@@ -14,37 +14,6 @@ def etl_extract() ->str:
 
     # --------------------------------------------------# 
     #                                                   #
-    #         We create the Snowflake connection        #
-    #                                                   #
-    # --------------------------------------------------#
-
-    #We create the connection with Snowflake
-    conn = snowflake.connector.connect(
-        user='grupods03',
-        password='Henry2022#',
-        account='nr28668.sa-east-1.aws')
-
-    # We start connection 
-    def execute_query(connection, query):
-        cursor = connection.cursor() #Creates a cursor object. Each statement will be executed in a new cursor object.
-        cursor.execute(query)
-        cursor.close()
-
-    # --------------------------------------------------# 
-    #                                                   #
-    #           We use database and warehouse           #
-    #                                                   #
-    # --------------------------------------------------#
-
-    # Since the database and warehouse are already created, we only need to start using them:
-    query = "Use database LAKE" # Initialize database
-    execute_query(conn, query)
-
-    query = "Use warehouse DW_EV" # Initialize datawarehouse
-    execute_query(conn, query)
-
-    # --------------------------------------------------# 
-    #                                                   #
     #       We load data to the dimension tables        #
     #                                                   #
     # --------------------------------------------------#
@@ -56,7 +25,7 @@ def etl_extract() ->str:
     df=pd.DataFrame({"CONTINENTE":Continentes})
 
     #Se codifica ID_PAIS a partir de CODIGO_PAIS
-    le_conti = LabelEncoder()
+    le_conti = preprocessing.LabelEncoder()
     le_conti.fit(df['CONTINENTE'])
     df['ID_CONTINENTE'] = le_conti.transform(df['CONTINENTE'])
 
@@ -67,7 +36,6 @@ def etl_extract() ->str:
     pickle.dump(le_conti,filehandler)
     filehandler.close()
     
-    
 
     #****************************#
     # Loading data to PAIS table #
@@ -77,7 +45,7 @@ def etl_extract() ->str:
     df=pd.DataFrame({'CODIGO_PAIS':Nation_code,'NOMBRE': Nation}) #Creamos el dataframe para PAIS
 
     #Se codifica ID_PAIS a partir de CODIGO_PAIS
-    le_nation = LabelEncoder()
+    le_nation = preprocessing.LabelEncoder()
     le_nation.fit(df['CODIGO_PAIS'])
     df['ID_PAIS'] = le_nation.transform(df['CODIGO_PAIS'])
 
@@ -87,7 +55,6 @@ def etl_extract() ->str:
     pickle.dump(le_nation,filehandler)
     filehandler.close()
 
-    
 
     #******************************#
     # Loading data to INCOME table #
@@ -97,7 +64,7 @@ def etl_extract() ->str:
     df = pd.DataFrame({'INCOME':Income, 'CODIGO_INCOME':CODIGO_INC}) #Se crea el dataframe para INCOME
 
     #Se codifica ID_INCOME a partir de Codigo_income
-    le_income = LabelEncoder()
+    le_income = preprocessing.LabelEncoder()
     le_income.fit(df['CODIGO_INCOME'])
     df['ID_INCOME'] = le_income.transform(df['CODIGO_INCOME'])
 
@@ -194,7 +161,7 @@ def etl_extract() ->str:
     df=pd.DataFrame({'CODIGO':Code_Indicador,'DESCRIPCION':Indicador}) 
 
     #Se codifica ID_INDICADOR a partir de CODIGO
-    le_indicador = LabelEncoder()
+    le_indicador = preprocessing.LabelEncoder()
     le_indicador.fit(df['CODIGO'])
     df['ID_INDICADOR'] = le_indicador.transform(df['CODIGO'])
 
