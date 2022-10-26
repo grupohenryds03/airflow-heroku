@@ -1,13 +1,8 @@
-
 import pandas as pd
 from sklearn.impute import KNNImputer
-import snowflake.connector
-import ssl
-import tempfile
 
 def etl_transform(df: pd.DataFrame) -> pd.DataFrame:
     
-
     #-----------------------------------------------------
 
     df.drop_duplicates(inplace = True) # eliminamos las filas duplicadas
