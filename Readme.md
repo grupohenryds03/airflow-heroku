@@ -33,3 +33,42 @@ airflow-heroku
 ├── runtime.txt
 └── webserver_config.py
 ```
+
+- Archivos en el STORAGE de SNOWFLAKE
+
+| archivo                              | internal storage | tipo de compresión |
+|--------------------------------------|------------------|--------------------|
+| banco mundial.csv                    | snowflake        | .gz                |
+| organización mundial de la salud.csv | snowflake        | .gz                |
+
+- Para el armado del data warehouse se crean las tablas relacionales de hecho y dimensión con sus respectivos Id´s y primary keys.
+
+- tabla de hecho
+
+| col     | tipo   | key | 
+|---------|--------|-----|
+| Idpais  | int    | PK  |
+| Codpais | string | -   |
+| año     | int    | -   |
+| income  | float  | -   |
+| Idcont  | ..     | -   |
+| IdVar   | float  | -   |
+
+- tablas de dimesiones
+
+- income
+
+| col    | tipo   | key |
+|--------|--------|-----|
+| idPais | int    | PK  |
+| pais   | string | -   |
+| income | string | -   |
+
+- geográfica
+
+| col    | tipo   | key |
+|--------|--------|-----|
+| idPais | int    | PK  |
+| pais   | string | -   |
+| región | string | -   |
+
