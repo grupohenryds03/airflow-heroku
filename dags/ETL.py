@@ -1,6 +1,5 @@
 from airflow.models import DAG
 from airflow.decorators import task
-import snowflake.connector
 from datetime import datetime
 import pandas as pd
 
@@ -25,6 +24,7 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
 def load_data(df: pd.DataFrame):
     import tempfile
     import module.snow as sn
+    import snowflake.connector
  
 
     temp_dir=tempfile.mkdtemp()
