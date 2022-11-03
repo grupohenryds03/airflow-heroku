@@ -6,13 +6,13 @@ import snowflake.connector
 import pandas as pd
 
 conn = snowflake.connector.connect(
-    user=Variable.get('SNOW_USER'),
-    password=Variable.get('SNOW_PASSWORD'),
-    account=Variable.get('SNOW_ACCOUNT'),
-    warehouse=Variable.get('SNOW_WAREHOUSE'),
-    database=Variable.get('SNOW_DATABASE')
+    user=Variable.get('snow_user'),
+    password=Variable.get('snow_password'),
+    account=Variable.get('snow_account'),
+    warehouse=Variable.get('snow_warehouse'),
+    database=Variable.get('snow_database')
     )
-
+#funcion de coneccion a snowflake
 def execute_query(connection, query):
     cursor = connection.cursor()
     cursor.execute(query)
@@ -20,7 +20,7 @@ def execute_query(connection, query):
 
 #conn = SnowflakeHook(snowflake_conn_id="snowflake_conn")
 
-#funcion de coneccion a snowflake
+
 
 
 @task #tarea de extraccion de datos del WB y WHO
