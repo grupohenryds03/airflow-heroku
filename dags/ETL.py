@@ -3,7 +3,7 @@ from airflow.decorators import task
 import snowflake.connector
 from datetime import datetime
 import pandas as pd
-import molude.snow  as sn
+import module.snow  as sn
 
 #conn = SnowflakeHook(snowflake_conn_id="snowflake_conn")
 
