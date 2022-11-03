@@ -5,12 +5,18 @@ from datetime import datetime
 import snowflake.connector
 import pandas as pd
 
+SNOWFLAKE_WAREHOUSE = 'warehouse_name'
+SNOWFLAKE_DATABASE = 'database_name'
+SNOWFLAKE_USER='user_name'
+SNOWFLAKE_PASSWORD='password_name'
+SNOWFLAKE_ACCOUNT='account_name'
+
 conn = snowflake.connector.connect(
-    user=Variable.get('snow_user'),
-    password=Variable.get('snow_password'),
-    account=Variable.get('snow_account'),
-    warehouse=Variable.get('snow_warehouse'),
-    database=Variable.get('snow_database')
+    user=SNOWFLAKE_USER,
+    password=SNOWFLAKE_PASSWORD,
+    account=SNOWFLAKE_ACCOUNT,
+    warehouse=SNOWFLAKE_WAREHOUSE,
+    database=SNOWFLAKE_DATABASE
     )
 #funcion de coneccion a snowflake
 def execute_query(connection, query):
