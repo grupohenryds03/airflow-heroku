@@ -3,16 +3,17 @@ from airflow.decorators import task
 import snowflake.connector
 from datetime import datetime
 import pandas as pd
-from snow import *
+import molude.snow  as sn
 
+#conn = SnowflakeHook(snowflake_conn_id="snowflake_conn")
 
 #funcion de coneccion a snowflake
 conn = snowflake.connector.connect(
-        user=snow_user,
-        password=snow_password,
-        account=snow_account,
-        warehouse=snow_warehouse,
-        database=snow_database)
+        user=sn.snow_user,
+        password=sn.snow_password,
+        account=sn.snow_account,
+        warehouse=sn.snow_warehouse,
+        database=sn.snow_database)
 
 def execute_query(connection, query):
     cursor = connection.cursor()
@@ -36,6 +37,7 @@ def load_data(df: pd.DataFrame):
     df.to_csv(temp_dir +'/EV_limpio.csv', index=False)
     sql = f"PUT file://{temp_dir}/EV_limpio.csv @DATA_STAGE auto_compress=true"
     execute_query(conn, sql)
+    #dwh_hook.get_first(sql)
 
 #creación de las tareas con cronograma anual
 with DAG(
