@@ -7,11 +7,11 @@ import pandas as pd
 
 #funcion de coneccion a snowflake
 conn = snowflake.connector.connect(
-    snow_user='grupods03',
-    snow_password='Henry2022#',
-    snow_account='nr28668.sa-east-1.aws',
-    snow_warehouse='DW_EV',
-    snow_database="LAKE")
+    user='grupods03',
+    password='Henry2022#',
+    account='nr28668.sa-east-1.aws',
+    warehouse='DW_EV',
+    database="LAKE")
 
 def execute_query(connection, query):
     cursor = connection.cursor()
