@@ -4,5 +4,4 @@ snowflake-connector-python
 pandas
 wbgapi
 sklearn
-module
 
