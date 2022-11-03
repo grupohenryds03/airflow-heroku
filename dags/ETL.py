@@ -3,7 +3,7 @@ from airflow.decorators import task
 import snowflake.connector
 from datetime import datetime
 import pandas as pd
-from module.snow import *
+from snow import *
 
 
 #funcion de coneccion a snowflake
