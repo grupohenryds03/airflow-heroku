@@ -3,17 +3,18 @@ from airflow.decorators import task
 import snowflake.connector
 from datetime import datetime
 import pandas as pd
-import os
+import module.snow as sn
+
 
 
 
     
 conn = snowflake.connector.connect(
-        user=os.environ['snow_user'],
-        password=os.environ['snow_pass'],
-        account=os.environ['snow_account'],
-        warehouse=os.environ['snow_warehouse'],
-        database=os.environ['snow_database'])
+        user=sn.snow_user,
+        password=sn.snow_password,
+        account=sn.snow_account,
+        warehouse=sn.snow_warehouse,
+        database=sn.snow_database)
 
 def execute_query(connection, query):
     cursor = connection.cursor()
@@ -33,6 +34,7 @@ def extract_data() -> pd.DataFrame:
 @task #tarea de limpieza de datos
 def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     import module.transform as tran
+    
     return tran.etl_transform(df) #llama a la funcion de limpieza (rodri)
 
 @task #tarea de guardar archivo csv comprimido a stage de snowflake
