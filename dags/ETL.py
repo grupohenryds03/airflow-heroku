@@ -3,16 +3,16 @@ from airflow.decorators import task
 import snowflake.connector
 from datetime import datetime
 import pandas as pd
-import module.snow as sn
+
 
 
     
 conn = snowflake.connector.connect(
-        user=sn.snow_user,
-        password=sn.snow_password,
-        account=sn.snow_account,
-        warehouse=sn.snow_warehouse,
-        database=sn.snow_database)
+        user=$snow_user,
+        password=$snow_pass,
+        account=$snow_account,
+        warehouse=$snow_warehouse,
+        database=$snow_database)
 
 def execute_query(connection, query):
     cursor = connection.cursor()
