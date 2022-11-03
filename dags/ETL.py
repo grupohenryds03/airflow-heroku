@@ -8,11 +8,11 @@ import pandas as pd
 
     
 conn = snowflake.connector.connect(
-        user=$snow_user,
-        password=$snow_pass,
-        account=$snow_account,
-        warehouse=$snow_warehouse,
-        database=$snow_database)
+        user='snow_user',
+        password='snow_pass',
+        account='snow_account',
+        warehouse='snow_warehouse',
+        database='snow_database')
 
 def execute_query(connection, query):
     cursor = connection.cursor()
