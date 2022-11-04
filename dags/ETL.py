@@ -2,10 +2,10 @@ from airflow.models import DAG
 from airflow.decorators import task
 from datetime import datetime
 import pandas as pd
-import snowflake.connector
+import snowflake.connector as sn
 
     #funcion de coneccion a snowflake
-conn = snowflake.connector.connect(
+conn = sn.connect(
         user='grupods03',
         password='Henry2022#',
         account='nr28668.sa-east-1.aws',
