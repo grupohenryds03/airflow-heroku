@@ -8,11 +8,11 @@
 4.  Ingesta de data a base de datos relacional
 5. Acceso a base de datos para modelar progreciones en machine lerning y visualización en dasboard
 
-- La arquitectura sigue cinco pasos principales: el primero para analizar las fuentes de datos, el segundo para la Extracción, Trasformación (limpieza) y Carga (Load) llamado por sus siglas ETL. El tercer paso donde se realiza la carga incremental a la base de datos relacional, el cuarto la carga incremental y el último paso donde se realizan las consultas necesarias para ser utilizada en modelos de ML y visualización en dashboard.
 - El entorno de trabajo para el ETL se desarrola en AIRFLOW dentro de una cloud maching de HEROKU. Acceso a la api: https://etl-latin-data.herokuapp.com/
 - Para el armado del datalake se ingestan los datos en el entorno STAGE de SNOWFLAKE en formato .csv comprimido en .gz (pueden ser tambien json, parquet, xlsx).
 - En el caso de la base de datos relacional se utiliza SNOWFLAKE con la creación de un warehouse para su mantenimiento e ingesta incremental.
 - para el modelado en ML y visualización de datos se realiza querys según los requerimientos del cliente.
+- Se utlilizaron tres tipos de encriptado para la conexión a la base de datos: *secrets de streamlit, gitignore de github y variables de ariflow*.
 
 <img src="/imagenes/diagrama solo.jpg"/>
 
