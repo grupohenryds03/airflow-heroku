@@ -43,7 +43,7 @@ def load_data(df: pd.DataFrame):
 
 #creación de las tareas con cronograma anual
 with DAG(
-   "ETL",
+   "etl_v2",
    start_date=datetime(year=2022, month=10, day=23),
    schedule_interval='@yearly'
    ) as dag:
