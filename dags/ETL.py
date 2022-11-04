@@ -1,8 +1,21 @@
 from airflow.models import DAG
 from airflow.decorators import task
-
 from datetime import datetime
 import pandas as pd
+import snowflake.connector
+
+    #funcion de coneccion a snowflake
+conn = snowflake.connector.connect(
+        user='grupods03',
+        password='Henry2022#',
+        account='nr28668.sa-east-1.aws',
+        warehouse='DW_EV',
+        database="LAKE")
+
+def execute_query(connection, query):
+        cursor = connection.cursor()
+        cursor.execute(query)
+        cursor.close()
 
 
 
@@ -19,19 +32,6 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
 @task #tarea de guardar archivo csv comprimido a stage de snowflake
 def load_data(df: pd.DataFrame):
     import tempfile
-    import snowflake.connector
-    #funcion de coneccion a snowflake
-    conn = snowflake.connector.connect(
-        user='grupods03',
-        password='Henry2022#',
-        account='nr28668.sa-east-1.aws',
-        warehouse='DW_EV',
-        database="LAKE")
-
-    def execute_query(connection, query):
-        cursor = connection.cursor()
-        cursor.execute(query)
-        cursor.close()
     temp_dir=tempfile.mkdtemp()
     df.to_csv(temp_dir +'/EV_limpio.csv', index=False)
     sql = f"PUT file://{temp_dir}/EV_limpio.csv @DATA_STAGE auto_compress=true"
