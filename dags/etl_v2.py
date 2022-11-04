@@ -6,9 +6,6 @@ import pandas as pd
 import snowflake.connector as sn
 
 
-# Normal call style
-foo = Variable.get("foo")
-
     #funcion de coneccion a snowflake
 conn = sn.connect(
         user=Variable.get("SNOW_USER"),
