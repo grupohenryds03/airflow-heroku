@@ -45,4 +45,4 @@ with DAG(
    ) as dag:
         df_crudo = extract_data() #sale data cruda
         df_limpio=transform_data(df_crudo) #entra data cruda, sale limpia
-        load_data(df_limpio) # se guarda la data a snowflake
+        #load_data(df_limpio) # se guarda la data a snowflake
