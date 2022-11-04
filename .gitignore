@@ -130,7 +130,6 @@ dmypy.json
 
 # Ignore some Airflow folders
 dags/files/
-logs/
 
 notes.txt
 *.pid
