@@ -10,7 +10,9 @@ conn = sn.connect(
         password='Henry2022#',
         account='nr28668.sa-east-1.aws',
         warehouse='DW_EV',
-        database="LAKE")
+        database="LAKE",
+        schema='public',
+        insecure_mode=True)
 
 def execute_query(connection, query):
         cursor = connection.cursor()
